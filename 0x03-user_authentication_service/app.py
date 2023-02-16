@@ -5,14 +5,16 @@ from flask import Flask, jsonify, request, abort, redirect
 
 from auth import Auth
 
+
 app = Flask(__name__)
-AUTH =Auth()
+AUTH = Auth()
+
 
 @app.route("/", methods=["GET"], strict_slashes=False)
-def index() ->str:
+def index() -> str:
     """GET /
-    return:
-        homepage payload
+    Return:
+        - The home page's payload.
     """
     return jsonify({"message": "Bienvenue"})
 
@@ -30,6 +32,7 @@ def users() -> str:
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
 
+
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
 def login() -> str:
     """POST /sessions
@@ -44,6 +47,7 @@ def login() -> str:
     response.set_cookie("session_id", session_id)
     return response
 
+
 @app.route("/sessions", methods=["DELETE"], strict_slashes=False)
 def logout() -> str:
     """DELETE /sessions
@@ -57,9 +61,12 @@ def logout() -> str:
     AUTH.destroy_session(user.id)
     return redirect("/")
 
-@app.route('/profile', methods=['GET'])
-def profile():
-    """ Finds the user if the user exists
+
+@app.route("/profile", methods=["GET"], strict_slashes=False)
+def profile() -> str:
+    """GET /profile
+    Return:
+        - The user's profile information.
     """
     session_id = request.cookies.get("session_id")
     user = AUTH.get_user_from_session_id(session_id)
@@ -72,7 +79,7 @@ def profile():
 def get_reset_password_token() -> str:
     """POST /reset_password
     Return:
-        -The user's password reset payload
+        - The user's password reset payload.
     """
     email = request.form.get("email")
     reset_token = None
@@ -103,6 +110,7 @@ def update_password() -> str:
     if not is_password_changed:
         abort(403)
     return jsonify({"email": email, "message": "Password updated"})
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
